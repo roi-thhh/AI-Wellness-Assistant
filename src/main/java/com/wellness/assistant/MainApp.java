@@ -1,6 +1,5 @@
 package com.wellness.assistant;
 
-import com.wellness.assistant.services.ReminderService; // Import the service
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,10 +11,14 @@ import java.net.URL;
 
 public class MainApp extends Application {
 
-    private final ReminderService reminderService = new ReminderService(); // Create an instance
+    private ReminderService reminderService;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        // Start the background reminder service
+        reminderService = new ReminderService();
+        reminderService.start();
+
         URL fxmlUrl = getClass().getResource("/com/wellness/assistant/Dashboard.fxml");
         if (fxmlUrl == null) {
             System.err.println("Cannot find FXML file. Check the path!");
@@ -35,21 +38,13 @@ public class MainApp extends Application {
         primaryStage.setTitle("AI Wellness Assistant");
         primaryStage.setScene(scene);
         primaryStage.show();
-
-        // Start scheduling some demo reminders
-        startReminders();
-    }
-
-    private void startReminders() {
-        // For demonstration, schedule reminders with short intervals
-        reminderService.scheduleReminder("Drink Water", 15); // Reminder every 15 seconds
-        reminderService.scheduleReminder("Eye Rest", 30);   // Reminder every 30 seconds
     }
 
     @Override
     public void stop() {
-        // This is called when you close the window
-        reminderService.stopScheduler();
+        // Properly shut down the reminder service when the app is closed
+        System.out.println("Shutting down reminder service...");
+        reminderService.stop();
     }
 
     public static void main(String[] args) {
