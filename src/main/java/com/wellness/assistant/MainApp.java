@@ -1,50 +1,69 @@
 package com.wellness.assistant;
 
+import com.wellness.assistant.storage.DatabaseManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.net.URL;
-
+/**
+ * Main application class for the Wellness Hub.
+ */
 public class MainApp extends Application {
-
-    private ReminderService reminderService;
+    private static ReminderService reminderService;
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
-        // Start the background reminder service
-        reminderService = new ReminderService();
-        reminderService.start();
-
-        URL fxmlUrl = getClass().getResource("/com/wellness/assistant/Dashboard.fxml");
-        if (fxmlUrl == null) {
-            System.err.println("Cannot find FXML file. Check the path!");
-            return;
+    public void start(Stage primaryStage) {
+        try {
+            // Load the main view
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/wellness/assistant/MainView.fxml"));
+            Scene scene = new Scene(loader.load());
+            
+            // Load CSS styles
+            scene.getStylesheets().add(getClass().getResource("/com/wellness/assistant/styles.css").toExternalForm());
+            
+            // Set up the stage
+            primaryStage.setTitle("Wellness Hub");
+            primaryStage.setScene(scene);
+            primaryStage.setMinWidth(1000);
+            primaryStage.setMinHeight(700);
+            primaryStage.setWidth(1200);
+            primaryStage.setHeight(800);
+            
+            // Set application icon (if available)
+            try {
+                primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/com/wellness/assistant/icon.png")));
+            } catch (Exception e) {
+                // Icon not found, continue without it
+                System.out.println("Application icon not found, continuing without icon");
+            }
+            
+            primaryStage.show();
+            
+            // Start the reminder service
+            reminderService = new ReminderService();
+            reminderService.start();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error starting application: " + e.getMessage());
         }
-        Parent root = FXMLLoader.load(fxmlUrl);
-        
-        URL cssUrl = getClass().getResource("/com/wellness/assistant/styles.css");
-         if (cssUrl == null) {
-            System.err.println("Cannot find CSS file. Check the path!");
-            return;
-        }
-        
-        Scene scene = new Scene(root, 800, 600);
-        scene.getStylesheets().add(cssUrl.toExternalForm());
-
-        primaryStage.setTitle("AI Wellness Assistant");
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
 
     @Override
     public void stop() {
-        // Properly shut down the reminder service when the app is closed
-        System.out.println("Shutting down reminder service...");
-        reminderService.stop();
+        // Stop the reminder service when application closes
+        if (reminderService != null) {
+            reminderService.stop();
+        }
+        
+        // Close database connection
+        try {
+            DatabaseManager.getInstance().close();
+        } catch (Exception e) {
+            System.err.println("Error closing database: " + e.getMessage());
+        }
     }
 
     public static void main(String[] args) {

@@ -1,27 +1,94 @@
 package com.wellness.assistant.model;
 
+import java.time.LocalTime;
+
+/**
+ * Model class representing a habit in the wellness assistant application.
+ */
 public class Habit {
     private int id;
+    private String name;
     private String type;
-    private String status;
-    private String time; // New field for the reminder time
+    private LocalTime time;
+    private String frequency;
+    private boolean active;
 
-    public Habit(int id, String type, String status, String time) {
-        this.id = id;
+    public Habit() {
+        this.active = true;
+    }
+
+    public Habit(String name, String type, LocalTime time, String frequency) {
+        this();
+        this.name = name;
         this.type = type;
-        this.status = status;
+        this.time = time;
+        this.frequency = frequency;
+    }
+
+    public Habit(int id, String name, String type, LocalTime time, String frequency, boolean active) {
+        this(name, type, time, frequency);
+        this.id = id;
+        this.active = active;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public LocalTime getTime() {
+        return time;
+    }
+
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
-    // This controls how the habit is displayed in the list view
-    @Override
-    public String toString() {
-        return type + " at " + time + "  -  " + status;
+    public String getFrequency() {
+        return frequency;
     }
 
-    // Getters
-    public int getId() { return id; }
-    public String getType() { return type; }
-    public String getStatus() { return status; }
-    public String getTime() { return time; }
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    @Override
+    public String toString() {
+        return "Habit{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", time=" + time +
+                ", frequency='" + frequency + '\'' +
+                ", active=" + active +
+                '}';
+    }
 }

@@ -3,40 +3,142 @@ package com.wellness.assistant;
 import com.wellness.assistant.model.Habit;
 import com.wellness.assistant.storage.DatabaseManager;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField; // Import TextField
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-public class AddHabitController {
+import java.net.URL;
+import java.time.LocalTime;
+import java.util.ResourceBundle;
 
+/**
+ * Controller for the Add Habit dialog.
+ */
+public class AddHabitController implements Initializable {
+    @FXML
+    private TextField habitNameField;
+    
     @FXML
     private ComboBox<String> habitTypeComboBox;
-
+    
     @FXML
-    private TextField timeTextField; // Link to the FXML TextField
-
+    private TextField timeField;
+    
     @FXML
-    private void initialize() {
+    private ComboBox<String> frequencyComboBox;
+    
+    @FXML
+    private Button saveButton;
+    
+    @FXML
+    private Button cancelButton;
+
+    private DatabaseManager dbManager;
+    private Stage dialogStage;
+    private boolean okClicked = false;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        dbManager = DatabaseManager.getInstance();
+        setupComboBoxes();
+    }
+
+    private void setupComboBoxes() {
+        // Setup habit type options
         habitTypeComboBox.getItems().addAll(
-            "Drink Water", "Exercise", "Medicine", "Eye Rest", "Sleep", "Mood Tracking"
+            "water",
+            "exercise", 
+            "medicine",
+            "eye_rest",
+            "nutrition",
+            "sleep",
+            "mindfulness"
         );
+        habitTypeComboBox.setValue("water");
+        
+        // Setup frequency options
+        frequencyComboBox.getItems().addAll(
+            "daily",
+            "weekdays",
+            "weekends",
+            "weekly"
+        );
+        frequencyComboBox.setValue("daily");
     }
 
     @FXML
-    private void handleSaveHabit() {
-        String selectedType = habitTypeComboBox.getValue();
-        String time = timeTextField.getText(); // Get text from the time field
-
-        // Check that both fields have values
-        if (selectedType != null && !selectedType.isEmpty() && time != null && !time.isEmpty()) {
-            // Create the new Habit object with the time included
-            Habit newHabit = new Habit(0, selectedType, "Active", time);
-            DatabaseManager.getInstance().addHabit(newHabit);
-
-            Stage stage = (Stage) habitTypeComboBox.getScene().getWindow();
-            stage.close();
-        } else {
-            System.err.println("Habit type and time must be specified.");
+    private void handleSave() {
+        if (isInputValid()) {
+            try {
+                Habit habit = new Habit();
+                habit.setName(habitNameField.getText());
+                habit.setType(habitTypeComboBox.getValue());
+                habit.setTime(LocalTime.parse(timeField.getText()));
+                habit.setFrequency(frequencyComboBox.getValue());
+                habit.setActive(true);
+                
+                dbManager.addHabit(habit);
+                okClicked = true;
+                dialogStage.close();
+                
+            } catch (Exception e) {
+                System.err.println("Error saving habit: " + e.getMessage());
+                showErrorDialog("Error saving habit", e.getMessage());
+            }
         }
+    }
+
+    @FXML
+    private void handleCancel() {
+        dialogStage.close();
+    }
+
+    private boolean isInputValid() {
+        String errorMessage = "";
+        
+        if (habitNameField.getText() == null || habitNameField.getText().trim().isEmpty()) {
+            errorMessage += "Habit name is required!\n";
+        }
+        
+        if (timeField.getText() == null || timeField.getText().trim().isEmpty()) {
+            errorMessage += "Time is required!\n";
+        } else {
+            try {
+                LocalTime.parse(timeField.getText());
+            } catch (Exception e) {
+                errorMessage += "Time must be in HH:MM format!\n";
+            }
+        }
+        
+        if (errorMessage.isEmpty()) {
+            return true;
+        } else {
+            showErrorDialog("Invalid Input", errorMessage);
+            return false;
+        }
+    }
+
+    private void showErrorDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    /**
+     * Sets the stage of this dialog.
+     * @param dialogStage The dialog stage
+     */
+    public void setDialogStage(Stage dialogStage) {
+        this.dialogStage = dialogStage;
+    }
+
+    /**
+     * Returns true if the user clicked OK, false otherwise.
+     * @return True if OK was clicked
+     */
+    public boolean isOkClicked() {
+        return okClicked;
     }
 }

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.MyHabitsController" styleClass="habits-view">
+   <children>
+      <!-- Header Section -->
+      <HBox alignment="CENTER_LEFT" styleClass="habits-header">
+         <children>
+            <VBox>
+               <children>
+                  <Label fx:id="titleLabel" styleClass="page-title" text="Manage Your Habits" />
+                  <Label styleClass="page-subtitle" text="Create, edit, and organize your health routines" />
+               </children>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="addHabitButton" onAction="#handleAddHabitClick" styleClass="primary-button" text="+ Add New Habit">
+               <graphic>
+                  <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="PLUS" />
+               </graphic>
+            </Button>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+      </HBox>
+      
+      <!-- Filter Section -->
+      <HBox spacing="20.0" styleClass="filter-section">
+         <children>
+            <!-- Filter by Type -->
+            <VBox styleClass="filter-card">
+               <children>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="FILTER" styleClass="filter-icon" />
+                        <Label styleClass="filter-label" text="Filter by Type" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0" styleClass="filter-buttons">
+                     <children>
+                        <ToggleButton selected="true" styleClass="filter-button active" text="All" />
+                        <ToggleButton styleClass="filter-button" text="Water" />
+                        <ToggleButton styleClass="filter-button" text="Exercise" />
+                        <ToggleButton styleClass="filter-button" text="Medicine" />
+                        <ToggleButton styleClass="filter-button" text="Eye Rest" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            
+            <!-- Filter by Status -->
+            <VBox styleClass="filter-card">
+               <children>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="FILTER" styleClass="filter-icon" />
+                        <Label styleClass="filter-label" text="Filter by Status" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0" styleClass="filter-buttons">
+                     <children>
+                        <ToggleButton selected="true" styleClass="filter-button active" text="All" />
+                        <ToggleButton styleClass="filter-button" text="Active" />
+                        <ToggleButton styleClass="filter-button" text="Paused" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="30.0" right="30.0" top="0.0" />
+         </padding>
+      </HBox>
+      
+      <!-- Habits List Section -->
+      <VBox styleClass="habits-list-section">
+         <children>
+            <Label fx:id="habitsCountLabel" styleClass="section-title" text="4 Habits" />
+            <VBox fx:id="habitsListContainer" spacing="10.0" styleClass="habits-list" />
+         </children>
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="0.0" />
+         </padding>
+      </VBox>
+   </children>
+</VBox>
