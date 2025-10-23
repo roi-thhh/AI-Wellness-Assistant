@@ -90,7 +90,7 @@ echo.
 echo All major files are present. The application should now work properly.
 echo.
 echo To run the application:
-echo 1. Make sure Java 17 and Maven are installed
+echo 1. Make sure Java 21 (LTS) and Maven are installed
 echo 2. Run: mvn clean compile
 echo 3. Run: mvn javafx:run
 echo.

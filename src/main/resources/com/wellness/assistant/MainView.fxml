@@ -1,102 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.MainController">
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.MainController">
    <left>
-      <VBox styleClass="sidebar">
-         <children>
-            <!-- Header Section -->
-            <VBox styleClass="sidebar-header">
-               <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="HEART" size="24" styleClass="app-icon" />
-                        <VBox>
-                           <children>
-                              <Label styleClass="app-title" text="Wellness Hub" />
-                              <Label styleClass="app-subtitle" text="Your Health Companion" />
-                           </children>
-                        </VBox>
-                     </children>
-                     <padding>
-                        <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
-                     </padding>
-                  </HBox>
-               </children>
-            </VBox>
-            
-            <!-- Navigation Section -->
-            <VBox styleClass="navigation-section">
-               <children>
-                  <Label styleClass="section-label" text="NAVIGATION" />
-                  <VBox spacing="5.0" styleClass="navigation-buttons">
-                     <children>
-                        <Button fx:id="dashboardButton" onAction="#handleDashboardClick" styleClass="sidebar-button sidebar-button-active" text="Dashboard">
-                           <graphic>
-                              <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="HOME" />
-                           </graphic>
-                        </Button>
-                        <Button fx:id="myHabitsButton" onAction="#handleMyHabitsClick" styleClass="sidebar-button" text="My Habits">
-                           <graphic>
-                              <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="BULLSEYE" />
-                           </graphic>
-                        </Button>
-                        <Button fx:id="analyticsButton" onAction="#handleAnalyticsClick" styleClass="sidebar-button" text="Analytics">
-                           <graphic>
-                              <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="BAR_CHART" />
-                           </graphic>
-                        </Button>
-                     </children>
-                  </VBox>
-               </children>
-               <padding>
-                  <Insets left="20.0" right="20.0" />
-               </padding>
-            </VBox>
-            
-            <!-- Quick Stats Section -->
-            <VBox styleClass="quick-stats-section">
-               <children>
-                  <Label styleClass="section-label" text="QUICK STATS" />
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label text="Today's Progress " />
-                        <Label fx:id="todayProgressLabel" styleClass="progress-label" text="--" />
-                     </children>
-                  </HBox>
-                  <ProgressBar fx:id="todayProgressBar" maxWidth="Infinity" progress="0.0" styleClass="progress-bar" />
-               </children>
-               <padding>
-                  <Insets left="20.0" right="20.0" />
-               </padding>
-            </VBox>
-            
-            <!-- User Profile Section -->
-            <VBox alignment="CENTER_LEFT" styleClass="user-profile-section">
-               <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Circle styleClass="user-avatar" />
-                        <VBox>
-                           <children>
-                              <Label fx:id="userTitleLabel" styleClass="user-title" text="Health Champion" />
-                              <Label fx:id="userMessageLabel" styleClass="user-message" text="Keep up the great work!" />
-                           </children>
-                        </VBox>
-                     </children>
-                  </HBox>
-               </children>
-               <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </padding>
-            </VBox>
-         </children>
-      </VBox>
+      <!-- Sidebar will be loaded programmatically to pass MainController reference -->
+      <VBox fx:id="sidebarContainer" />
    </left>
    <center>
       <StackPane fx:id="contentArea" styleClass="content-area" />

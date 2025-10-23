@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.MyHabitsController" styleClass="habits-view">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.MyHabitsController" styleClass="habits-view">
    <children>
       <!-- Header Section -->
       <HBox alignment="CENTER_LEFT" styleClass="habits-header">
@@ -19,7 +19,7 @@
             <Region HBox.hgrow="ALWAYS" />
             <Button fx:id="addHabitButton" onAction="#handleAddHabitClick" styleClass="primary-button" text="+ Add New Habit">
                <graphic>
-                  <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="PLUS" />
+                  <FontIcon iconLiteral="fas-plus" />
                </graphic>
             </Button>
          </children>
@@ -36,7 +36,7 @@
                <children>
                   <HBox alignment="CENTER_LEFT">
                      <children>
-                        <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="FILTER" styleClass="filter-icon" />
+                        <FontIcon iconLiteral="fas-filter" styleClass="filter-icon" />
                         <Label styleClass="filter-label" text="Filter by Type" />
                      </children>
                   </HBox>
@@ -57,7 +57,7 @@
                <children>
                   <HBox alignment="CENTER_LEFT">
                      <children>
-                        <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="FILTER" styleClass="filter-icon" />
+                        <FontIcon iconLiteral="fas-filter" styleClass="filter-icon" />
                         <Label styleClass="filter-label" text="Filter by Status" />
                      </children>
                   </HBox>

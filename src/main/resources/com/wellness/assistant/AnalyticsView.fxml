@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Rectangle?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.AnalyticsController" styleClass="analytics-view">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.AnalyticsController" styleClass="analytics-view">
    <children>
       <!-- Header Section -->
       <VBox styleClass="analytics-header">
@@ -22,7 +22,7 @@
       <!-- Time Period Selector -->
       <HBox alignment="CENTER_LEFT" styleClass="time-period-section">
          <children>
-            <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="CALENDAR" styleClass="calendar-icon" />
+            <FontIcon iconLiteral="fas-calendar" styleClass="calendar-icon" />
             <Label styleClass="time-period-label" text="Time Period" />
             <HBox spacing="5.0" styleClass="time-period-buttons">
                <children>
@@ -44,68 +44,73 @@
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
          </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         </rowConstraints>
+         
          <children>
             <!-- Total Activities Card -->
-            <VBox styleClass="analytics-card">
+            <VBox styleClass="analytics-card" alignment="TOP_LEFT" spacing="8">
                <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label text="Total Activities" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Rectangle styleClass="analytics-icon" />
-                     </children>
-                  </HBox>
-                  <Label fx:id="totalActivitiesValue" styleClass="analytics-value" text="0" />
-                  <Label styleClass="analytics-subtitle" text="0 completed" />
+                     <Label text="Total Activities" styleClass="card-label">
+                        <VBox.margin>
+                           <Insets bottom="8.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label fx:id="totalActivitiesValue" styleClass="analytics-value">
+                        <VBox.margin>
+                           <Insets bottom="4.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label styleClass="analytics-subtitle" text="completed" />
                </children>
             </VBox>
             
             <!-- Completion Rate Card -->
-            <VBox GridPane.columnIndex="1" styleClass="analytics-card">
+            <VBox GridPane.columnIndex="1" styleClass="analytics-card" alignment="TOP_LEFT" spacing="8">
                <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label text="Completion Rate" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Rectangle styleClass="analytics-icon" />
-                     </children>
-                  </HBox>
-                  <Label fx:id="completionRateValue" styleClass="analytics-value" text="0%" />
-                  <Label styleClass="analytics-subtitle" text="Keep it up!" />
+                     <Label text="Completion Rate" styleClass="card-label">
+                        <VBox.margin>
+                           <Insets bottom="8.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label fx:id="completionRateValue" styleClass="analytics-value">
+                        <VBox.margin>
+                           <Insets bottom="4.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label styleClass="analytics-subtitle" text="Keep it up!" />
                </children>
             </VBox>
             
             <!-- Completed Card -->
-            <VBox GridPane.rowIndex="1" styleClass="analytics-card completed-card">
+            <VBox GridPane.rowIndex="1" styleClass="analytics-card completed-card" alignment="TOP_LEFT" spacing="8">
                <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label text="Completed" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Rectangle styleClass="analytics-icon" />
-                     </children>
-                  </HBox>
-                  <Label fx:id="completedValue" styleClass="analytics-value" text="0" />
-                  <Label styleClass="analytics-subtitle" text="Activities done" />
+                     <Label text="Completed" styleClass="card-label">
+                        <VBox.margin>
+                           <Insets bottom="8.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label fx:id="completedValue" styleClass="analytics-value">
+                        <VBox.margin>
+                           <Insets bottom="4.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label styleClass="analytics-subtitle" text="activities done" />
                </children>
             </VBox>
             
             <!-- Skipped Card -->
-            <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="analytics-card skipped-card">
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="analytics-card skipped-card" alignment="TOP_LEFT" spacing="8">
                <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label text="Skipped" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Rectangle styleClass="analytics-icon" />
-                     </children>
-                  </HBox>
-                  <Label fx:id="skippedValue" styleClass="analytics-value" text="0" />
-                  <Label styleClass="analytics-subtitle" text="Try to reduce these" />
+                     <Label text="Skipped" styleClass="card-label">
+                        <VBox.margin>
+                           <Insets bottom="8.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label fx:id="skippedValue" styleClass="analytics-value">
+                        <VBox.margin>
+                           <Insets bottom="4.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label styleClass="analytics-subtitle" text="try to reduce these" />
                </children>
             </VBox>
          </children>
@@ -115,11 +120,14 @@
       </GridPane>
       
       <!-- AI Recommendations Section -->
-      <VBox styleClass="recommendations-section">
+      <VBox styleClass="recommendations-section" spacing="15">
          <children>
-            <HBox alignment="CENTER_LEFT">
+               <HBox alignment="CENTER_LEFT" spacing="10">
+                  <VBox.margin>
+                     <Insets bottom="10.0" />
+                  </VBox.margin>
                <children>
-                  <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="STAR" styleClass="section-icon" />
+                  <FontIcon iconLiteral="fas-star" styleClass="section-icon" />
                   <Label styleClass="section-title" text="AI-Powered Recommendations" />
                </children>
             </HBox>
@@ -131,9 +139,13 @@
       </VBox>
       
       <!-- Activity History Section -->
-      <VBox styleClass="activity-history-section">
+      <VBox styleClass="activity-history-section" spacing="15">
          <children>
-            <Label styleClass="section-title" text="Activity History" />
+               <Label styleClass="section-title" text="Activity History">
+                  <VBox.margin>
+                     <Insets bottom="10.0" />
+                  </VBox.margin>
+               </Label>
             <VBox fx:id="activityHistoryContainer" spacing="10.0" styleClass="activity-history-list" />
          </children>
          <padding>

@@ -15,14 +15,21 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        System.out.println("[MainApp] Starting Wellness Hub application...");
         try {
-            // Load the main view
+            System.out.println("[MainApp] Loading MainView.fxml...");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/wellness/assistant/MainView.fxml"));
             Scene scene = new Scene(loader.load());
-            
+            System.out.println("[MainApp] MainView.fxml loaded successfully.");
+
             // Load CSS styles
-            scene.getStylesheets().add(getClass().getResource("/com/wellness/assistant/styles.css").toExternalForm());
-            
+            try {
+                scene.getStylesheets().add(getClass().getResource("/com/wellness/assistant/styles.css").toExternalForm());
+                System.out.println("[MainApp] styles.css loaded.");
+            } catch (Exception cssEx) {
+                System.err.println("[MainApp] Error loading styles.css: " + cssEx.getMessage());
+            }
+
             // Set up the stage
             primaryStage.setTitle("Wellness Hub");
             primaryStage.setScene(scene);
@@ -30,24 +37,31 @@ public class MainApp extends Application {
             primaryStage.setMinHeight(700);
             primaryStage.setWidth(1200);
             primaryStage.setHeight(800);
-            
+
             // Set application icon (if available)
             try {
                 primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/com/wellness/assistant/icon.png")));
+                System.out.println("[MainApp] Application icon loaded.");
             } catch (Exception e) {
-                // Icon not found, continue without it
-                System.out.println("Application icon not found, continuing without icon");
+                System.out.println("[MainApp] Application icon not found, continuing without icon");
             }
-            
+
             primaryStage.show();
-            
+            primaryStage.toFront();
+            System.out.println("[MainApp] Main window shown.");
+
             // Start the reminder service
-            reminderService = new ReminderService();
-            reminderService.start();
-            
+            try {
+                reminderService = new ReminderService();
+                reminderService.start();
+                System.out.println("[MainApp] ReminderService started.");
+            } catch (Exception rsEx) {
+                System.err.println("[MainApp] Error starting ReminderService: " + rsEx.getMessage());
+            }
+
         } catch (Exception e) {
+            System.err.println("[MainApp] Error starting application: " + e.getMessage());
             e.printStackTrace();
-            System.err.println("Error starting application: " + e.getMessage());
         }
     }
 

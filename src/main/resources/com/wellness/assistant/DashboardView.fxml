@@ -4,8 +4,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Rectangle?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.DashboardController" styleClass="dashboard-view">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.DashboardController" styleClass="dashboard-view">
    <children>
       <!-- Header Section -->
       <HBox alignment="CENTER_LEFT" styleClass="dashboard-header">
@@ -19,7 +20,7 @@
             <Region HBox.hgrow="ALWAYS" />
             <Button fx:id="addHabitButton" onAction="#handleAddHabitClick" styleClass="primary-button" text="+ Add New Habit">
                <graphic>
-                  <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="PLUS" />
+                  <FontIcon iconLiteral="fas-plus" />
                </graphic>
             </Button>
          </children>
@@ -34,68 +35,73 @@
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
          </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         </rowConstraints>
+         
          <children>
             <!-- Today's Progress Card -->
-            <VBox styleClass="summary-card">
+            <VBox styleClass="summary-card" alignment="TOP_LEFT" spacing="8">
                <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label text="Today's Progress" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Rectangle styleClass="card-icon" />
-                     </children>
-                  </HBox>
-                  <Label fx:id="todaysProgressValue" styleClass="card-value" text="2/4" />
-                  <Label styleClass="card-subtitle" text="50% completed" />
+                     <Label text="Today's Progress" styleClass="card-label">
+                        <VBox.margin>
+                           <Insets bottom="8.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label fx:id="todaysProgressValue" styleClass="card-value">
+                        <VBox.margin>
+                           <Insets bottom="4.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label styleClass="card-subtitle" text="completed" />
                </children>
             </VBox>
             
             <!-- Active Habits Card -->
-            <VBox GridPane.columnIndex="1" styleClass="summary-card">
+            <VBox GridPane.columnIndex="1" styleClass="summary-card" alignment="TOP_LEFT" spacing="8">
                <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label text="Active Habits" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Rectangle styleClass="category-icon exercise" />
-                     </children>
-                  </HBox>
-                  <Label fx:id="activeHabitsValue" styleClass="card-value" text="4" />
-                  <Label styleClass="card-subtitle" text="Habits in your routine" />
+                     <Label text="Active Habits" styleClass="card-label">
+                        <VBox.margin>
+                           <Insets bottom="8.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label fx:id="activeHabitsValue" styleClass="card-value">
+                        <VBox.margin>
+                           <Insets bottom="4.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label styleClass="card-subtitle" text="in your routine" />
                </children>
             </VBox>
             
             <!-- Completion Rate Card -->
-            <VBox GridPane.rowIndex="1" styleClass="summary-card">
+            <VBox GridPane.rowIndex="1" styleClass="summary-card" alignment="TOP_LEFT" spacing="8">
                <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label text="Completion Rate" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Rectangle styleClass="category-icon nutrition" />
-                     </children>
-                  </HBox>
-                  <Label fx:id="completionRateValue" styleClass="card-value" text="50%" />
-                  <Label styleClass="card-subtitle" text="Keep it up!" />
+                     <Label text="Completion Rate" styleClass="card-label">
+                        <VBox.margin>
+                           <Insets bottom="8.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label fx:id="completionRateValue" styleClass="card-value">
+                        <VBox.margin>
+                           <Insets bottom="4.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label styleClass="card-subtitle" text="Keep it up!" />
                </children>
             </VBox>
             
             <!-- Total Logs Card -->
-            <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="summary-card">
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="summary-card" alignment="TOP_LEFT" spacing="8">
                <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label text="Total Logs" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Rectangle styleClass="category-icon medicine" />
-                     </children>
-                  </HBox>
-                  <Label fx:id="totalLogsValue" styleClass="card-value" text="2" />
-                  <Label styleClass="card-subtitle" text="Activities today" />
+                     <Label text="Total Logs" styleClass="card-label">
+                        <VBox.margin>
+                           <Insets bottom="8.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label fx:id="totalLogsValue" styleClass="card-value">
+                        <VBox.margin>
+                           <Insets bottom="4.0" />
+                        </VBox.margin>
+                     </Label>
+                     <Label styleClass="card-subtitle" text="activities today" />
                </children>
             </VBox>
          </children>
@@ -107,7 +113,11 @@
       <!-- Today's Habits Section -->
       <VBox styleClass="todays-habits-section">
          <children>
-            <Label styleClass="section-title" text="Today's Habits" />
+               <Label styleClass="section-title" text="Today's Habits">
+                  <VBox.margin>
+                     <Insets bottom="15.0" />
+                  </VBox.margin>
+               </Label>
             <ScrollPane fitToWidth="true" styleClass="habits-scroll-pane">
                <content>
                   <VBox fx:id="habitsListContainer" spacing="10.0" styleClass="habits-list" />
@@ -124,7 +134,7 @@
          <children>
             <HBox alignment="CENTER_LEFT">
                <children>
-                  <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="STAR" styleClass="quote-icon" />
+                  <FontIcon iconLiteral="fas-star" styleClass="quote-icon" />
                   <Label styleClass="quote-title" text="Daily Wellness Quote" />
                </children>
             </HBox>

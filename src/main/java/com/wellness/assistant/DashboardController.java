@@ -4,6 +4,7 @@ import com.wellness.assistant.model.Habit;
 import com.wellness.assistant.model.HealthLog;
 import com.wellness.assistant.storage.DatabaseManager;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -51,6 +52,7 @@ public class DashboardController implements Initializable {
 
     private DatabaseManager dbManager;
     private AIAdvisor aiAdvisor;
+    private MainController mainController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -60,6 +62,11 @@ public class DashboardController implements Initializable {
 
     public void initialize() {
         initializeDashboard();
+    }
+
+    /** Injects MainController so this controller can request sidebar refreshes. */
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
     }
 
     private void initializeDashboard() {
@@ -213,10 +220,11 @@ public class DashboardController implements Initializable {
             dbManager.logActivity(log);
             System.out.println("Marked habit as done: " + habit.getName());
             // Refresh the dashboard
+            loadSummaryStats();
             loadTodaysHabits();
             // Update progress in main controller
-            if (MainController.class.getDeclaredMethod("updateTodayProgress") != null) {
-                // This would update the progress in the main controller
+            if (mainController != null) {
+                mainController.refreshQuickStats();
             }
         } catch (Exception e) {
             System.err.println("Error marking habit as done: " + e.getMessage());
@@ -224,8 +232,33 @@ public class DashboardController implements Initializable {
     }
     
     private void editHabit(Habit habit) {
-        // Open edit habit dialog
-        System.out.println("Edit habit: " + habit.getName());
+        // Open edit habit dialog using the AddHabitDialog in edit mode
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/wellness/assistant/AddHabitDialog.fxml"));
+            javafx.scene.Scene dialogScene = new javafx.scene.Scene(loader.load());
+
+            AddHabitController controller = loader.getController();
+            controller.setHabit(habit); // put dialog in edit mode
+
+            javafx.stage.Stage dialogStage = new javafx.stage.Stage();
+            dialogStage.setTitle("Edit Habit");
+            dialogStage.setScene(dialogScene);
+            dialogStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            dialogStage.setResizable(false);
+
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait();
+
+            if (controller.isOkClicked()) {
+                loadSummaryStats();
+                loadTodaysHabits();
+                if (mainController != null) mainController.refreshQuickStats();
+            }
+        } catch (Exception e) {
+            System.err.println("Error opening edit habit dialog: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     private void loadDailyQuote() {

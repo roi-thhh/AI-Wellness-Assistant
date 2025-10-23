@@ -7,8 +7,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 
 import java.net.URL;
 import java.util.List;
@@ -35,6 +39,7 @@ public class MyHabitsController implements Initializable {
 
     private DatabaseManager dbManager;
     private ObservableList<Habit> habitsList;
+    private MainController mainController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -45,6 +50,11 @@ public class MyHabitsController implements Initializable {
 
     public void initialize() {
         initializeView();
+    }
+
+    /** Inject MainController for refreshing quick stats after actions. */
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
     }
 
     private void initializeView() {
@@ -76,20 +86,71 @@ public class MyHabitsController implements Initializable {
     }
 
     private void createHabitCard(Habit habit) {
-        // Create habit card UI elements
-        // This is a simplified version - in a real implementation, you'd create custom components
-        
-        Label habitLabel = new Label(habit.getName() + " - " + habit.getType() + " - " + habit.getTime());
-        habitLabel.getStyleClass().add("habit-card");
-        
+        // Create a polished habit card similar to dashboard cards
+        HBox habitCard = new HBox();
+        habitCard.getStyleClass().add("habit-card");
+        habitCard.setSpacing(15);
+        habitCard.setPadding(new javafx.geometry.Insets(15, 20, 15, 20));
+
+        // Icon rectangle with color per type
+        Rectangle iconRect = new Rectangle(40, 40);
+        iconRect.setArcWidth(8);
+        iconRect.setArcHeight(8);
+        iconRect.setFill(javafx.scene.paint.Paint.valueOf(getIconColorForHabitType(habit.getType())));
+
+        Label iconLabel = new Label(getIconTextForHabitType(habit.getType()));
+        iconLabel.setTextFill(javafx.scene.paint.Color.WHITE);
+        iconLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        StackPane iconPane = new StackPane(iconRect, iconLabel);
+
+        // Details
+        VBox detailsBox = new VBox();
+        detailsBox.setSpacing(5);
+        Label habitNameLabel = new Label(habit.getName());
+        habitNameLabel.getStyleClass().add("habit-name");
+        HBox timeBox = new HBox();
+        timeBox.setSpacing(10);
+        Label timeLabel = new Label(habit.getTime().toString());
+        timeLabel.getStyleClass().add("habit-time");
+        Label frequencyLabel = new Label(habit.getFrequency());
+        frequencyLabel.getStyleClass().add("habit-frequency");
+        timeBox.getChildren().addAll(timeLabel, frequencyLabel);
+        detailsBox.getChildren().addAll(habitNameLabel, timeBox);
+
+        // Actions
+        HBox actionBox = new HBox();
+        actionBox.setSpacing(10);
         Button doneButton = new Button("Done");
+        doneButton.getStyleClass().add("primary-button");
         doneButton.setOnAction(e -> markHabitDone(habit));
-        
-        Button editButton = new Button("Edit");
+        Button editButton = new Button();
+        editButton.getStyleClass().add("edit-button");
+        editButton.setText("✏");
         editButton.setOnAction(e -> editHabit(habit));
-        
-        // Add to container
-        habitsListContainer.getChildren().add(habitLabel);
+        actionBox.getChildren().addAll(doneButton, editButton);
+
+        habitCard.getChildren().addAll(iconPane, detailsBox, actionBox);
+        habitsListContainer.getChildren().add(habitCard);
+    }
+
+    private String getIconColorForHabitType(String type) {
+        return switch (type) {
+            case "water" -> "#2196F3"; // Blue
+            case "exercise" -> "#FF9800"; // Orange
+            case "medicine" -> "#F44336"; // Red
+            case "eye_rest" -> "#9C27B0"; // Purple
+            default -> "#4CAF50"; // Green
+        };
+    }
+
+    private String getIconTextForHabitType(String type) {
+        return switch (type) {
+            case "water" -> "💧";
+            case "exercise" -> "🏃";
+            case "medicine" -> "💊";
+            case "eye_rest" -> "👁";
+            default -> "⭐";
+        };
     }
 
     private void markHabitDone(Habit habit) {
@@ -101,6 +162,9 @@ public class MyHabitsController implements Initializable {
             System.out.println("Marked habit as done: " + habit.getName());
             // Refresh the view
             loadHabits();
+            if (mainController != null) {
+                mainController.refreshQuickStats();
+            }
             
         } catch (Exception e) {
             System.err.println("Error marking habit as done: " + e.getMessage());
@@ -108,8 +172,31 @@ public class MyHabitsController implements Initializable {
     }
 
     private void editHabit(Habit habit) {
-        // Open edit habit dialog
-        System.out.println("Edit habit: " + habit.getName());
+        // Open edit habit dialog using the AddHabitDialog in edit mode
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/wellness/assistant/AddHabitDialog.fxml"));
+            javafx.scene.Scene dialogScene = new javafx.scene.Scene(loader.load());
+
+            AddHabitController controller = loader.getController();
+            controller.setHabit(habit); // edit mode
+
+            javafx.stage.Stage dialogStage = new javafx.stage.Stage();
+            dialogStage.setTitle("Edit Habit");
+            dialogStage.setScene(dialogScene);
+            dialogStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            dialogStage.setResizable(false);
+
+            controller.setDialogStage(dialogStage);
+            dialogStage.showAndWait();
+
+            if (controller.isOkClicked()) {
+                loadHabits();
+                if (mainController != null) mainController.refreshQuickStats();
+            }
+        } catch (Exception e) {
+            System.err.println("Error opening edit habit dialog: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void setupFilters() {
@@ -119,8 +206,30 @@ public class MyHabitsController implements Initializable {
 
     @FXML
     private void handleAddHabitClick() {
-        // Open add habit dialog
-        System.out.println("Add habit button clicked");
+        // Open add habit dialog similar to dashboard
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/wellness/assistant/AddHabitDialog.fxml"));
+            javafx.scene.Scene dialogScene = new javafx.scene.Scene(loader.load());
+
+            AddHabitController controller = loader.getController();
+
+            javafx.stage.Stage dialogStage = new javafx.stage.Stage();
+            dialogStage.setTitle("Add New Habit");
+            dialogStage.setScene(dialogScene);
+            dialogStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            dialogStage.setResizable(false);
+
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait();
+
+            if (controller.isOkClicked()) {
+                loadHabits();
+            }
+        } catch (Exception e) {
+            System.err.println("Error opening add habit dialog: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML

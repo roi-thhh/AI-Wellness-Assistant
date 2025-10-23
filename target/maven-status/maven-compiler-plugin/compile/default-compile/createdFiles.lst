@@ -8,6 +8,7 @@ com\wellness\assistant\storage\DatabaseManager.class
 com\wellness\assistant\MainApp.class
 com\wellness\assistant\SidebarController.class
 com\wellness\assistant\AIAdvisor.class
+com\wellness\assistant\MainController.class
 com\wellness\assistant\AnalyticsController.class
 com\wellness\assistant\model\User.class
 com\wellness\assistant\ReminderService.class

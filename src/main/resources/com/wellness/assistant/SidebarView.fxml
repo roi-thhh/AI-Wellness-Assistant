@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Circle?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.SidebarController" styleClass="sidebar">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wellness.assistant.SidebarController" styleClass="sidebar">
    <children>
       <!-- Header Section -->
       <VBox styleClass="sidebar-header">
          <children>
             <HBox alignment="CENTER_LEFT">
                <children>
-                  <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="HEART" size="24" styleClass="app-icon" />
+                  <FontIcon iconLiteral="fas-heart" styleClass="app-icon" />
                   <VBox>
                      <children>
                         <Label styleClass="app-title" text="Wellness Hub" />
@@ -36,17 +36,17 @@
                <children>
                   <Button fx:id="dashboardButton" onAction="#handleDashboardClick" styleClass="sidebar-button" text="Dashboard">
                      <graphic>
-                        <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="HOME" />
+                        <FontIcon iconLiteral="fas-home" />
                      </graphic>
                   </Button>
                   <Button fx:id="myHabitsButton" onAction="#handleMyHabitsClick" styleClass="sidebar-button" text="My Habits">
                      <graphic>
-                        <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="BULLSEYE" />
+                        <FontIcon iconLiteral="fas-bullseye" />
                      </graphic>
                   </Button>
                   <Button fx:id="analyticsButton" onAction="#handleAnalyticsClick" styleClass="sidebar-button" text="Analytics">
                      <graphic>
-                        <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="BAR_CHART" />
+                        <FontIcon iconLiteral="fas-chart-bar" />
                      </graphic>
                   </Button>
                </children>

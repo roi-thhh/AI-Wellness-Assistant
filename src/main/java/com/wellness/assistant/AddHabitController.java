@@ -36,6 +36,8 @@ public class AddHabitController implements Initializable {
     private DatabaseManager dbManager;
     private Stage dialogStage;
     private boolean okClicked = false;
+    private boolean editMode = false;
+    private Habit editingHabit;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -70,14 +72,22 @@ public class AddHabitController implements Initializable {
     private void handleSave() {
         if (isInputValid()) {
             try {
-                Habit habit = new Habit();
-                habit.setName(habitNameField.getText());
-                habit.setType(habitTypeComboBox.getValue());
-                habit.setTime(LocalTime.parse(timeField.getText()));
-                habit.setFrequency(frequencyComboBox.getValue());
-                habit.setActive(true);
-                
-                dbManager.addHabit(habit);
+                if (editMode && editingHabit != null) {
+                    editingHabit.setName(habitNameField.getText());
+                    editingHabit.setType(habitTypeComboBox.getValue());
+                    editingHabit.setTime(LocalTime.parse(timeField.getText()));
+                    editingHabit.setFrequency(frequencyComboBox.getValue());
+                    editingHabit.setActive(true);
+                    dbManager.updateHabit(editingHabit);
+                } else {
+                    Habit habit = new Habit();
+                    habit.setName(habitNameField.getText());
+                    habit.setType(habitTypeComboBox.getValue());
+                    habit.setTime(LocalTime.parse(timeField.getText()));
+                    habit.setFrequency(frequencyComboBox.getValue());
+                    habit.setActive(true);
+                    dbManager.addHabit(habit);
+                }
                 okClicked = true;
                 dialogStage.close();
                 
@@ -140,5 +150,18 @@ public class AddHabitController implements Initializable {
      */
     public boolean isOkClicked() {
         return okClicked;
+    }
+
+    /**
+     * Configure the dialog to edit an existing habit and prefill fields.
+     */
+    public void setHabit(Habit habit) {
+        if (habit == null) return;
+        this.editMode = true;
+        this.editingHabit = habit;
+        habitNameField.setText(habit.getName());
+        habitTypeComboBox.setValue(habit.getType());
+        timeField.setText(habit.getTime() != null ? habit.getTime().toString() : "");
+        frequencyComboBox.setValue(habit.getFrequency());
     }
 }
