@@ -1,3 +1,11 @@
+com\wellness\assistant\model\Reminder.class
+com\wellness\assistant\ReminderService$1.class
 com\wellness\assistant\model\Habit.class
 com\wellness\assistant\DashboardController.class
 com\wellness\assistant\AddHabitController.class
+com\wellness\assistant\services\ReminderService$1.class
+com\wellness\assistant\storage\DatabaseManager.class
+com\wellness\assistant\services\ReminderService.class
+com\wellness\assistant\MainApp.class
+com\wellness\assistant\model\User.class
+com\wellness\assistant\ReminderService.class
