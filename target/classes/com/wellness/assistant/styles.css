@@ -26,6 +26,7 @@
 }
 
 .app-title {
+
     -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-text-fill: #333333;
@@ -735,10 +736,31 @@
     -fx-text-fill: #333333;
 }
 
+.dialog-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #666666;
+}
+
 .add-habit-dialog Label {
     -fx-font-size: 14px;
     -fx-text-fill: #333333;
     -fx-font-weight: 500;
+}
+
+/* Inline validation message */
+.validation-message {
+     -fx-text-fill: #D32F2F;
+     -fx-font-size: 12px;
+     -fx-padding: 8 10;
+     -fx-background-color: #fdecea;
+     -fx-background-radius: 6px;
+     -fx-border-color: #f5c2c7;
+     -fx-border-radius: 6px;
+}
+
+.field-hint {
+     -fx-text-fill: #777777;
+     -fx-font-size: 11px;
 }
 
 .add-habit-dialog TextField,

@@ -12,6 +12,7 @@ public class Habit {
     private LocalTime time;
     private String frequency;
     private boolean active;
+    private String notes;
 
     public Habit() {
         this.active = true;
@@ -80,6 +81,14 @@ public class Habit {
         this.active = active;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
     @Override
     public String toString() {
         return "Habit{" +
@@ -88,7 +97,8 @@ public class Habit {
                 ", type='" + type + '\'' +
                 ", time=" + time +
                 ", frequency='" + frequency + '\'' +
-                ", active=" + active +
+        ", active=" + active +
+        ", notes='" + notes + '\'' +
                 '}';
     }
 }

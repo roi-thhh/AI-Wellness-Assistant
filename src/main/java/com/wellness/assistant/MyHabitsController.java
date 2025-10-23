@@ -41,6 +41,14 @@ public class MyHabitsController implements Initializable {
     private ObservableList<Habit> habitsList;
     private MainController mainController;
 
+    // Filters
+    @FXML private ToggleButton typeAllBtn, typeWaterBtn, typeExerciseBtn, typeMedicineBtn, typeEyeRestBtn;
+    @FXML private ToggleButton statusAllBtn, statusActiveBtn, statusPausedBtn;
+    @FXML private ToggleGroup typeGroup, statusGroup;
+
+    private String selectedType = "All";   // All | water | exercise | medicine | eye_rest
+    private String selectedStatus = "All"; // All | Active | Paused
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         dbManager = DatabaseManager.getInstance();
@@ -114,7 +122,10 @@ public class MyHabitsController implements Initializable {
         timeLabel.getStyleClass().add("habit-time");
         Label frequencyLabel = new Label(habit.getFrequency());
         frequencyLabel.getStyleClass().add("habit-frequency");
-        timeBox.getChildren().addAll(timeLabel, frequencyLabel);
+        Label statusLabel = new Label(habit.isActive() ? "Active" : "Paused");
+        statusLabel.getStyleClass().add("habit-status");
+        if (habit.isActive()) statusLabel.getStyleClass().add("active"); else statusLabel.getStyleClass().add("paused");
+        timeBox.getChildren().addAll(timeLabel, frequencyLabel, statusLabel);
         detailsBox.getChildren().addAll(habitNameLabel, timeBox);
 
         // Actions
@@ -127,7 +138,10 @@ public class MyHabitsController implements Initializable {
         editButton.getStyleClass().add("edit-button");
         editButton.setText("✏");
         editButton.setOnAction(e -> editHabit(habit));
-        actionBox.getChildren().addAll(doneButton, editButton);
+        Button pauseResumeButton = new Button(habit.isActive() ? "Pause" : "Resume");
+        pauseResumeButton.getStyleClass().add(habit.isActive() ? "pause-button" : "resume-button");
+        pauseResumeButton.setOnAction(e -> toggleHabitActive(habit));
+        actionBox.getChildren().addAll(doneButton, editButton, pauseResumeButton);
 
         habitCard.getChildren().addAll(iconPane, detailsBox, actionBox);
         habitsListContainer.getChildren().add(habitCard);
@@ -151,6 +165,17 @@ public class MyHabitsController implements Initializable {
             case "eye_rest" -> "👁";
             default -> "⭐";
         };
+    }
+
+    private void toggleHabitActive(Habit habit) {
+        try {
+            habit.setActive(!habit.isActive());
+            dbManager.updateHabit(habit);
+            loadHabits();
+            if (mainController != null) mainController.refreshQuickStats();
+        } catch (Exception ex) {
+            System.err.println("Error toggling habit status: " + ex.getMessage());
+        }
     }
 
     private void markHabitDone(Habit habit) {
@@ -200,8 +225,82 @@ public class MyHabitsController implements Initializable {
     }
 
     private void setupFilters() {
-        // Setup filter buttons and functionality
-        // This would be implemented to filter habits by type and status
+        // Ensure toggle groups work exclusively
+        if (typeGroup != null && typeAllBtn != null) {
+            typeAllBtn.setSelected(true);
+        }
+        if (statusGroup != null && statusAllBtn != null) {
+            statusAllBtn.setSelected(true);
+        }
+
+        refreshFilterStyles();
+    }
+
+    @FXML
+    private void onTypeFilterChanged() {
+        if (typeAllBtn.isSelected()) selectedType = "All";
+        else if (typeWaterBtn.isSelected()) selectedType = "water";
+        else if (typeExerciseBtn.isSelected()) selectedType = "exercise";
+        else if (typeMedicineBtn.isSelected()) selectedType = "medicine";
+        else if (typeEyeRestBtn.isSelected()) selectedType = "eye_rest";
+        applyFilters();
+    }
+
+    @FXML
+    private void onStatusFilterChanged() {
+        if (statusAllBtn.isSelected()) selectedStatus = "All";
+        else if (statusActiveBtn.isSelected()) selectedStatus = "Active";
+        else if (statusPausedBtn.isSelected()) selectedStatus = "Paused";
+        applyFilters();
+    }
+
+    private void applyFilters() {
+        try {
+            List<Habit> all = dbManager.getAllHabits();
+            habitsList.clear();
+            for (Habit h : all) {
+                if (!matchesType(h)) continue;
+                if (!matchesStatus(h)) continue;
+                habitsList.add(h);
+            }
+            habitsCountLabel.setText(habitsList.size() + " Habits");
+            displayHabits();
+            refreshFilterStyles();
+        } catch (Exception e) {
+            System.err.println("Error applying filters: " + e.getMessage());
+        }
+    }
+
+    private boolean matchesType(Habit h) {
+        if ("All".equals(selectedType)) return true;
+        return selectedType.equalsIgnoreCase(h.getType());
+    }
+
+    private boolean matchesStatus(Habit h) {
+        if ("All".equals(selectedStatus)) return true;
+        if ("Active".equals(selectedStatus)) return h.isActive();
+        if ("Paused".equals(selectedStatus)) return !h.isActive();
+        return true;
+    }
+
+    private void refreshFilterStyles() {
+        // Toggle 'active' class according to selection to match CSS
+        ToggleButton[] typeBtns = {typeAllBtn, typeWaterBtn, typeExerciseBtn, typeMedicineBtn, typeEyeRestBtn};
+        for (ToggleButton b : typeBtns) if (b != null) {
+            if (b.isSelected()) {
+                if (!b.getStyleClass().contains("active")) b.getStyleClass().add("active");
+            } else {
+                b.getStyleClass().remove("active");
+            }
+        }
+        ToggleButton[] statusBtns = {statusAllBtn, statusActiveBtn, statusPausedBtn};
+        for (ToggleButton b : statusBtns) if (b != null) {
+            if (b.isSelected()) {
+                if (!b.getStyleClass().contains("active")) b.getStyleClass().add("active");
+            } else {
+                b.getStyleClass().remove("active");
+            }
+        }
     }
 
     @FXML

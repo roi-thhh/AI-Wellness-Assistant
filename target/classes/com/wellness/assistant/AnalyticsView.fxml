@@ -26,10 +26,10 @@
             <Label styleClass="time-period-label" text="Time Period" />
             <HBox spacing="5.0" styleClass="time-period-buttons">
                <children>
-                  <ToggleButton styleClass="time-period-button" text="Today" />
-                  <ToggleButton selected="true" styleClass="time-period-button active" text="This Week" />
-                  <ToggleButton styleClass="time-period-button" text="Last 30 Days" />
-                  <ToggleButton styleClass="time-period-button" text="All Time" />
+                  <ToggleButton fx:id="todayBtn" styleClass="time-period-button" text="Today" onAction="#onPeriodChanged" toggleGroup="$periodGroup" />
+                  <ToggleButton fx:id="thisWeekBtn" selected="true" styleClass="time-period-button active" text="This Week" onAction="#onPeriodChanged" toggleGroup="$periodGroup" />
+                  <ToggleButton fx:id="last30Btn" styleClass="time-period-button" text="Last 30 Days" onAction="#onPeriodChanged" toggleGroup="$periodGroup" />
+                  <ToggleButton fx:id="allTimeBtn" styleClass="time-period-button" text="All Time" onAction="#onPeriodChanged" toggleGroup="$periodGroup" />
                </children>
             </HBox>
          </children>

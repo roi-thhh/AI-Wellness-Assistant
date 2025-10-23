@@ -9,7 +9,9 @@
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
    <children>
-      <Label text="Add New Habit" styleClass="dialog-title" />
+      <Label fx:id="dialogTitle" text="Add New Habit" styleClass="dialog-title" />
+      <Label fx:id="dialogSubtitle" text="Create a healthy routine" styleClass="dialog-subtitle" />
+      <Label fx:id="validationMessage" text="" styleClass="validation-message" visible="false" managed="false" />
       
       <GridPane hgap="10.0" vgap="15.0">
          <columnConstraints>
@@ -17,6 +19,8 @@
             <ColumnConstraints minWidth="250.0" prefWidth="250.0" hgrow="ALWAYS" />
          </columnConstraints>
          <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
             <RowConstraints />
             <RowConstraints />
             <RowConstraints />
@@ -33,11 +37,24 @@
             
             <!-- Time -->
             <Label text="Time (HH:MM):" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-            <TextField fx:id="timeField" promptText="08:00" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <VBox GridPane.columnIndex="1" GridPane.rowIndex="2" spacing="5.0">
+               <children>
+                  <TextField fx:id="timeField" promptText="08:00" />
+                  <Label text="24-hour format" styleClass="field-hint" />
+               </children>
+            </VBox>
             
             <!-- Frequency -->
             <Label text="Frequency:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
             <ComboBox fx:id="frequencyComboBox" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+            <!-- Active -->
+            <Label text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <CheckBox fx:id="activeCheckBox" text="Active" selected="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+            <!-- Notes -->
+            <Label text="Notes:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+            <TextArea fx:id="notesArea" GridPane.columnIndex="1" GridPane.rowIndex="5" prefRowCount="3" wrapText="true" promptText="Optional description or instructions" />
          </children>
       </GridPane>
       

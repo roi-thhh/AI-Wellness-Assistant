@@ -160,7 +160,7 @@ public class DashboardController implements Initializable {
         Label habitNameLabel = new Label(habit.getName());
         habitNameLabel.getStyleClass().add("habit-name");
         
-        HBox timeBox = new HBox();
+    HBox timeBox = new HBox();
         timeBox.setSpacing(10);
         
         Label timeLabel = new Label(habit.getTime().toString());
@@ -168,8 +168,12 @@ public class DashboardController implements Initializable {
         
         Label frequencyLabel = new Label(habit.getFrequency());
         frequencyLabel.getStyleClass().add("habit-frequency");
-        
-        timeBox.getChildren().addAll(timeLabel, frequencyLabel);
+
+    Label statusLabel = new Label(habit.isActive() ? "Active" : "Paused");
+    statusLabel.getStyleClass().add("habit-status");
+    if (habit.isActive()) statusLabel.getStyleClass().add("active"); else statusLabel.getStyleClass().add("paused");
+
+    timeBox.getChildren().addAll(timeLabel, frequencyLabel, statusLabel);
         detailsBox.getChildren().addAll(habitNameLabel, timeBox);
         
         // Create action buttons
@@ -180,18 +184,34 @@ public class DashboardController implements Initializable {
         doneButton.getStyleClass().add("primary-button");
         doneButton.setOnAction(e -> markHabitDone(habit));
         
-        Button editButton = new Button();
+    Button editButton = new Button();
         editButton.getStyleClass().add("edit-button");
         editButton.setText("✏");
         editButton.setOnAction(e -> editHabit(habit));
-        
-        actionBox.getChildren().addAll(doneButton, editButton);
+
+    Button pauseButton = new Button("Pause");
+    pauseButton.getStyleClass().add("pause-button");
+    pauseButton.setOnAction(e -> toggleHabitActive(habit));
+
+    actionBox.getChildren().addAll(doneButton, editButton, pauseButton);
         
         // Add all elements to the habit card
         habitCard.getChildren().addAll(iconPane, detailsBox, actionBox);
         
         // Add to container
         habitsListContainer.getChildren().add(habitCard);
+    }
+
+    private void toggleHabitActive(Habit habit) {
+        try {
+            habit.setActive(!habit.isActive());
+            dbManager.updateHabit(habit);
+            loadSummaryStats();
+            loadTodaysHabits();
+            if (mainController != null) mainController.refreshQuickStats();
+        } catch (Exception ex) {
+            System.err.println("Error toggling habit status: " + ex.getMessage());
+        }
     }
     
     private String getIconColorForHabitType(String type) {

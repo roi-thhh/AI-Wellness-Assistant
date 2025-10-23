@@ -5,10 +5,14 @@ import com.wellness.assistant.storage.DatabaseManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -41,8 +45,15 @@ public class AnalyticsController implements Initializable {
     @FXML
     private VBox activityHistoryContainer;
 
+    // Period controls
+    @FXML private ToggleButton todayBtn, thisWeekBtn, last30Btn, allTimeBtn;
+    @FXML private ToggleGroup periodGroup;
+
     private DatabaseManager dbManager;
     private AIAdvisor aiAdvisor;
+
+    private enum Period { TODAY, THIS_WEEK, LAST_30_DAYS, ALL_TIME }
+    private Period selectedPeriod = Period.THIS_WEEK;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -59,32 +70,32 @@ public class AnalyticsController implements Initializable {
         titleLabel.setText("Your Wellness Analytics");
         subtitleLabel.setText("Track your progress and get AI-powered insights");
         
-        loadAnalytics();
+        // Initialize default selected period based on UI
+        if (todayBtn != null && todayBtn.isSelected()) selectedPeriod = Period.TODAY;
+        else if (thisWeekBtn != null && thisWeekBtn.isSelected()) selectedPeriod = Period.THIS_WEEK;
+        else if (last30Btn != null && last30Btn.isSelected()) selectedPeriod = Period.LAST_30_DAYS;
+        else selectedPeriod = Period.ALL_TIME;
+
+        loadAnalyticsForPeriod();
         loadRecommendations();
-        loadActivityHistory();
+        loadActivityHistoryForPeriod();
     }
 
-    private void loadAnalytics() {
+    private void loadAnalyticsForPeriod() {
         try {
-            // Load summary statistics
-            int totalActiveHabits = dbManager.getTotalActiveHabits();
-            int completedToday = dbManager.getTodaysCompletedActivities();
-            double completionRate = dbManager.getCompletionRate();
-            
-            // Get all logs for additional statistics
-            List<HealthLog> allLogs = dbManager.getAllLogs();
-            long totalCompleted = allLogs.stream()
-                    .filter(log -> "Completed".equals(log.getStatus()))
-                    .count();
-            long totalSkipped = allLogs.stream()
-                    .filter(log -> "Skipped".equals(log.getStatus()))
-                    .count();
-            
-            // Update UI elements
-            totalActivitiesValue.setText(String.valueOf(totalActiveHabits));
+            LocalDate[] range = getDateRange(selectedPeriod);
+            LocalDate start = range[0];
+            LocalDate end = range[1];
+
+            int totalActivities = dbManager.getLogsCountBetween(start, end);
+            int completed = dbManager.getLogsCountByStatusBetween("Completed", start, end);
+            int skipped = dbManager.getLogsCountByStatusBetween("Skipped", start, end);
+            double completionRate = dbManager.getCompletionRateBetween(start, end);
+
+            totalActivitiesValue.setText(String.valueOf(totalActivities));
             completionRateValue.setText(String.format("%.0f%%", completionRate));
-            completedValue.setText(String.valueOf(totalCompleted));
-            skippedValue.setText(String.valueOf(totalSkipped));
+            completedValue.setText(String.valueOf(completed));
+            skippedValue.setText(String.valueOf(skipped));
             
         } catch (Exception e) {
             System.err.println("Error loading analytics: " + e.getMessage());
@@ -147,9 +158,10 @@ public class AnalyticsController implements Initializable {
         return "💡";
     }
 
-    private void loadActivityHistory() {
+    private void loadActivityHistoryForPeriod() {
         try {
-            List<HealthLog> logs = dbManager.getAllLogs();
+            LocalDate[] range = getDateRange(selectedPeriod);
+            List<HealthLog> logs = dbManager.getLogsBetween(range[0], range[1]);
             activityHistoryContainer.getChildren().clear();
             
             // Limit to last 10 entries for display
@@ -177,5 +189,41 @@ public class AnalyticsController implements Initializable {
         statusLabel.getStyleClass().add("status-" + log.getStatus().toLowerCase());
         
         activityHistoryContainer.getChildren().add(entryLabel);
+    }
+
+    @FXML
+    private void onPeriodChanged() {
+        if (todayBtn.isSelected()) selectedPeriod = Period.TODAY;
+        else if (thisWeekBtn.isSelected()) selectedPeriod = Period.THIS_WEEK;
+        else if (last30Btn.isSelected()) selectedPeriod = Period.LAST_30_DAYS;
+        else selectedPeriod = Period.ALL_TIME;
+        syncPeriodButtonStyles();
+        loadAnalyticsForPeriod();
+        loadActivityHistoryForPeriod();
+    }
+
+    private void syncPeriodButtonStyles() {
+        ToggleButton[] buttons = {todayBtn, thisWeekBtn, last30Btn, allTimeBtn};
+        for (ToggleButton b : buttons) if (b != null) {
+            if (b.isSelected()) {
+                if (!b.getStyleClass().contains("active")) b.getStyleClass().add("active");
+            } else {
+                b.getStyleClass().remove("active");
+            }
+        }
+    }
+
+    private LocalDate[] getDateRange(Period p) {
+        LocalDate today = LocalDate.now();
+        return switch (p) {
+            case TODAY -> new LocalDate[]{today, today};
+            case THIS_WEEK -> {
+                LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+                LocalDate endOfWeek = today.with(DayOfWeek.SUNDAY);
+                yield new LocalDate[]{startOfWeek, endOfWeek};
+            }
+            case LAST_30_DAYS -> new LocalDate[]{today.minusDays(29), today};
+            case ALL_TIME -> new LocalDate[]{LocalDate.of(1970,1,1), today};
+        };
     }
 }

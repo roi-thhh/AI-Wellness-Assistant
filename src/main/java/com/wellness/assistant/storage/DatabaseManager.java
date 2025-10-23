@@ -5,6 +5,7 @@ import com.wellness.assistant.model.HealthLog;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,18 @@ public class DatabaseManager {
             stmt.execute(createHabitsTable);
             stmt.execute(createLogsTable);
         }
+
+        // Schema migration: add notes column to habits if missing
+        ensureNotesColumn();
+    }
+
+    private void ensureNotesColumn() {
+        try (Statement stmt = connection.createStatement()) {
+            // Attempt to add the column; if it exists, SQLite will throw an error which we ignore
+            stmt.executeUpdate("ALTER TABLE habits ADD COLUMN notes TEXT");
+        } catch (SQLException ignored) {
+            // Column likely already exists; ignore
+        }
     }
 
     private void insertSampleData() throws SQLException {
@@ -95,27 +108,57 @@ public class DatabaseManager {
 
     // Habit CRUD operations
     public void addHabit(Habit habit) throws SQLException {
-        String sql = "INSERT INTO habits (name, type, time, frequency, active) VALUES (?, ?, ?, ?, ?)";
+        // Include notes if column exists; using explicit column list keeps backward compatibility
+        String sql = "INSERT INTO habits (name, type, time, frequency, active, notes) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, habit.getName());
             pstmt.setString(2, habit.getType());
             pstmt.setString(3, habit.getTime().toString());
             pstmt.setString(4, habit.getFrequency());
             pstmt.setBoolean(5, habit.isActive());
-            pstmt.executeUpdate();
+            pstmt.setString(6, habit.getNotes());
+            try {
+                pstmt.executeUpdate();
+            } catch (SQLException ex) {
+                // Fallback for old schema without notes
+                String legacy = "INSERT INTO habits (name, type, time, frequency, active) VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement ps2 = connection.prepareStatement(legacy)) {
+                    ps2.setString(1, habit.getName());
+                    ps2.setString(2, habit.getType());
+                    ps2.setString(3, habit.getTime().toString());
+                    ps2.setString(4, habit.getFrequency());
+                    ps2.setBoolean(5, habit.isActive());
+                    ps2.executeUpdate();
+                }
+            }
         }
     }
 
     public void updateHabit(Habit habit) throws SQLException {
-        String sql = "UPDATE habits SET name = ?, type = ?, time = ?, frequency = ?, active = ? WHERE id = ?";
+        String sql = "UPDATE habits SET name = ?, type = ?, time = ?, frequency = ?, active = ?, notes = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, habit.getName());
             pstmt.setString(2, habit.getType());
             pstmt.setString(3, habit.getTime().toString());
             pstmt.setString(4, habit.getFrequency());
             pstmt.setBoolean(5, habit.isActive());
-            pstmt.setInt(6, habit.getId());
-            pstmt.executeUpdate();
+            pstmt.setString(6, habit.getNotes());
+            pstmt.setInt(7, habit.getId());
+            try {
+                pstmt.executeUpdate();
+            } catch (SQLException ex) {
+                // Fallback for old schema without notes
+                String legacy = "UPDATE habits SET name = ?, type = ?, time = ?, frequency = ?, active = ? WHERE id = ?";
+                try (PreparedStatement ps2 = connection.prepareStatement(legacy)) {
+                    ps2.setString(1, habit.getName());
+                    ps2.setString(2, habit.getType());
+                    ps2.setString(3, habit.getTime().toString());
+                    ps2.setString(4, habit.getFrequency());
+                    ps2.setBoolean(5, habit.isActive());
+                    ps2.setInt(6, habit.getId());
+                    ps2.executeUpdate();
+                }
+            }
         }
     }
 
@@ -129,7 +172,7 @@ public class DatabaseManager {
 
     public List<Habit> getAllHabits() throws SQLException {
         List<Habit> habits = new ArrayList<>();
-        String sql = "SELECT * FROM habits ORDER BY time";
+    String sql = "SELECT * FROM habits ORDER BY time";
         
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -142,6 +185,11 @@ public class DatabaseManager {
                 habit.setTime(LocalTime.parse(rs.getString("time")));
                 habit.setFrequency(rs.getString("frequency"));
                 habit.setActive(rs.getBoolean("active"));
+                try {
+                    habit.setNotes(rs.getString("notes"));
+                } catch (SQLException ignore) {
+                    habit.setNotes(null);
+                }
                 habits.add(habit);
             }
         }
@@ -162,6 +210,7 @@ public class DatabaseManager {
                 habit.setTime(LocalTime.parse(rs.getString("time")));
                 habit.setFrequency(rs.getString("frequency"));
                 habit.setActive(rs.getBoolean("active"));
+                try { habit.setNotes(rs.getString("notes")); } catch (SQLException ignore) { habit.setNotes(null);} 
                 return habit;
             }
         }
@@ -251,6 +300,55 @@ public class DatabaseManager {
              ResultSet rs = stmt.executeQuery(sql)) {
             return rs.getDouble(1);
         }
+    }
+
+    // Date-range statistics
+    public int getLogsCountBetween(LocalDate start, LocalDate end) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM health_logs WHERE DATE(timestamp) BETWEEN DATE(?) AND DATE(?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, start.toString());
+            ps.setString(2, end.toString());
+            ResultSet rs = ps.executeQuery();
+            return rs.getInt(1);
+        }
+    }
+
+    public int getLogsCountByStatusBetween(String status, LocalDate start, LocalDate end) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM health_logs WHERE status = ? AND DATE(timestamp) BETWEEN DATE(?) AND DATE(?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, start.toString());
+            ps.setString(3, end.toString());
+            ResultSet rs = ps.executeQuery();
+            return rs.getInt(1);
+        }
+    }
+
+    public double getCompletionRateBetween(LocalDate start, LocalDate end) throws SQLException {
+        int total = getLogsCountBetween(start, end);
+        if (total == 0) return 0.0;
+        int completed = getLogsCountByStatusBetween("Completed", start, end);
+        return (completed * 100.0) / total;
+    }
+
+    public List<HealthLog> getLogsBetween(LocalDate start, LocalDate end) throws SQLException {
+        List<HealthLog> logs = new ArrayList<>();
+        String sql = "SELECT * FROM health_logs WHERE DATE(timestamp) BETWEEN DATE(?) AND DATE(?) ORDER BY timestamp DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, start.toString());
+            ps.setString(2, end.toString());
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                HealthLog log = new HealthLog();
+                log.setLogId(rs.getInt("log_id"));
+                log.setHabitId(rs.getInt("habit_id"));
+                log.setHabitName(rs.getString("habit_name"));
+                log.setStatus(rs.getString("status"));
+                log.setTimestamp(LocalDateTime.parse(rs.getString("timestamp")));
+                logs.add(log);
+            }
+        }
+        return logs;
     }
 
     public void close() throws SQLException {

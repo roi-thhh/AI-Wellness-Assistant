@@ -42,11 +42,11 @@
                   </HBox>
                   <HBox spacing="5.0" styleClass="filter-buttons">
                      <children>
-                        <ToggleButton selected="true" styleClass="filter-button active" text="All" />
-                        <ToggleButton styleClass="filter-button" text="Water" />
-                        <ToggleButton styleClass="filter-button" text="Exercise" />
-                        <ToggleButton styleClass="filter-button" text="Medicine" />
-                        <ToggleButton styleClass="filter-button" text="Eye Rest" />
+                        <ToggleButton fx:id="typeAllBtn" selected="true" styleClass="filter-button active" text="All" onAction="#onTypeFilterChanged" toggleGroup="$typeGroup" />
+                        <ToggleButton fx:id="typeWaterBtn" styleClass="filter-button" text="Water" onAction="#onTypeFilterChanged" toggleGroup="$typeGroup" />
+                        <ToggleButton fx:id="typeExerciseBtn" styleClass="filter-button" text="Exercise" onAction="#onTypeFilterChanged" toggleGroup="$typeGroup" />
+                        <ToggleButton fx:id="typeMedicineBtn" styleClass="filter-button" text="Medicine" onAction="#onTypeFilterChanged" toggleGroup="$typeGroup" />
+                        <ToggleButton fx:id="typeEyeRestBtn" styleClass="filter-button" text="Eye Rest" onAction="#onTypeFilterChanged" toggleGroup="$typeGroup" />
                      </children>
                   </HBox>
                </children>
@@ -63,9 +63,9 @@
                   </HBox>
                   <HBox spacing="5.0" styleClass="filter-buttons">
                      <children>
-                        <ToggleButton selected="true" styleClass="filter-button active" text="All" />
-                        <ToggleButton styleClass="filter-button" text="Active" />
-                        <ToggleButton styleClass="filter-button" text="Paused" />
+                        <ToggleButton fx:id="statusAllBtn" selected="true" styleClass="filter-button active" text="All" onAction="#onStatusFilterChanged" toggleGroup="$statusGroup" />
+                        <ToggleButton fx:id="statusActiveBtn" styleClass="filter-button" text="Active" onAction="#onStatusFilterChanged" toggleGroup="$statusGroup" />
+                        <ToggleButton fx:id="statusPausedBtn" styleClass="filter-button" text="Paused" onAction="#onStatusFilterChanged" toggleGroup="$statusGroup" />
                      </children>
                   </HBox>
                </children>

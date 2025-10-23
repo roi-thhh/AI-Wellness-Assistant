@@ -33,6 +33,21 @@ public class AddHabitController implements Initializable {
     @FXML
     private Button cancelButton;
 
+    @FXML
+    private Label validationMessage;
+
+    @FXML
+    private CheckBox activeCheckBox;
+
+    @FXML
+    private Label dialogTitle;
+
+    @FXML
+    private Label dialogSubtitle;
+
+    @FXML
+    private TextArea notesArea;
+
     private DatabaseManager dbManager;
     private Stage dialogStage;
     private boolean okClicked = false;
@@ -43,6 +58,9 @@ public class AddHabitController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         dbManager = DatabaseManager.getInstance();
         setupComboBoxes();
+        // Default header for add mode
+        if (dialogTitle != null) dialogTitle.setText("Add New Habit");
+        if (dialogSubtitle != null) dialogSubtitle.setText("Create a healthy routine");
     }
 
     private void setupComboBoxes() {
@@ -77,7 +95,8 @@ public class AddHabitController implements Initializable {
                     editingHabit.setType(habitTypeComboBox.getValue());
                     editingHabit.setTime(LocalTime.parse(timeField.getText()));
                     editingHabit.setFrequency(frequencyComboBox.getValue());
-                    editingHabit.setActive(true);
+                    editingHabit.setActive(activeCheckBox != null && activeCheckBox.isSelected());
+                    editingHabit.setNotes(notesArea != null ? notesArea.getText() : null);
                     dbManager.updateHabit(editingHabit);
                 } else {
                     Habit habit = new Habit();
@@ -85,7 +104,8 @@ public class AddHabitController implements Initializable {
                     habit.setType(habitTypeComboBox.getValue());
                     habit.setTime(LocalTime.parse(timeField.getText()));
                     habit.setFrequency(frequencyComboBox.getValue());
-                    habit.setActive(true);
+                    habit.setActive(activeCheckBox != null && activeCheckBox.isSelected());
+                    habit.setNotes(notesArea != null ? notesArea.getText() : null);
                     dbManager.addHabit(habit);
                 }
                 okClicked = true;
@@ -93,7 +113,7 @@ public class AddHabitController implements Initializable {
                 
             } catch (Exception e) {
                 System.err.println("Error saving habit: " + e.getMessage());
-                showErrorDialog("Error saving habit", e.getMessage());
+                showInlineError("Error saving habit: " + e.getMessage());
             }
         }
     }
@@ -121,19 +141,30 @@ public class AddHabitController implements Initializable {
         }
         
         if (errorMessage.isEmpty()) {
+            if (validationMessage != null) {
+                validationMessage.setVisible(false);
+                validationMessage.setManaged(false);
+                validationMessage.setText("");
+            }
             return true;
         } else {
-            showErrorDialog("Invalid Input", errorMessage);
+            showInlineError(errorMessage.trim());
             return false;
         }
     }
 
-    private void showErrorDialog(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void showInlineError(String message) {
+        if (validationMessage != null) {
+            validationMessage.setText(message);
+            validationMessage.setVisible(true);
+            validationMessage.setManaged(true);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        }
     }
 
     /**
@@ -163,5 +194,11 @@ public class AddHabitController implements Initializable {
         habitTypeComboBox.setValue(habit.getType());
         timeField.setText(habit.getTime() != null ? habit.getTime().toString() : "");
         frequencyComboBox.setValue(habit.getFrequency());
+        if (activeCheckBox != null) activeCheckBox.setSelected(habit.isActive());
+        if (notesArea != null) notesArea.setText(habit.getNotes());
+        // Update header and button for edit mode
+        if (dialogTitle != null) dialogTitle.setText("Edit Habit");
+        if (dialogSubtitle != null) dialogSubtitle.setText("Update your habit and save changes");
+        if (saveButton != null) saveButton.setText("Save Changes");
     }
 }
